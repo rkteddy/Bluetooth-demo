@@ -47,14 +47,19 @@ class SearchActivity: BaseActivity() {
      */
     fun initRecycleView() {
         deviceList.layoutManager = LinearLayoutManager(this)
+        val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        val pairedDevices = mBluetoothAdapter.bondedDevices
         mData = mutableListOf()
+        // Add paired devices to the list
+        for (device in pairedDevices)
+            mData.add(device)
         mAdapter = DeviceListAdapter(mData)
         mAdapter.setOnItemClickListener(object: DeviceListAdapter.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
-                var device = mData[position]
+                val device = mData[position]
                 toast(device.name)
-                var bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
-                var t = Thread {
+                val bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
+                val t = Thread {
                     try {
                         bluetoothSocket.connect()
                     } catch (e: Exception) {
@@ -89,7 +94,7 @@ class SearchActivity: BaseActivity() {
      * Initialize Receiver
      */
     fun initReceiver() {
-        var filter = IntentFilter()
+        val filter = IntentFilter()
         filter.addAction(BluetoothDevice.ACTION_FOUND)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
@@ -103,15 +108,15 @@ class SearchActivity: BaseActivity() {
 
     private val mBluetoothReceiver = object: BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            var action = intent.action
+            val action = intent.action
             Log.e(TAG, "Action: $action")
             when (action) {
                 BluetoothDevice.ACTION_FOUND -> {
                     val scanDevice = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                    if (scanDevice == null || scanDevice!!.name == null) return
-                    Log.e(TAG, "name=" + scanDevice!!.name + "address=" + scanDevice!!.address)
-                    var name = scanDevice!!.name
-                    var address = scanDevice!!.address
+                    if (scanDevice == null || scanDevice.name == null) return
+                    Log.e(TAG, "name=" + scanDevice.name + "address=" + scanDevice.address)
+                    var name = scanDevice.name
+                    val address = scanDevice.address
                     // Duplicate removal
                     var flag = true
                     mData.forEach { it ->

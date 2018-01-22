@@ -10,7 +10,7 @@ import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQUEST_ENABLE = 1
+    private val REQUEST_ENABLE_BT = 1
     private lateinit var mBluetoothLauncher: BluetoothLauncher
     private val TAG = "MainActivity"
 
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         try {
             mBluetoothLauncher = BluetoothLauncher.get()
-            mBluetoothLauncher.launchBluetooth(this, REQUEST_ENABLE)
+            mBluetoothLauncher.launchBluetooth(this, REQUEST_ENABLE_BT)
             mBluetoothLauncher.startServerSocket()
         } catch (e: NullPointerException) {
             Log.e(TAG, e.message)
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
      * Launch bluetooth
      */
     fun launch(v: View) {
-        mBluetoothLauncher.launchBluetooth(this, REQUEST_ENABLE)
+        mBluetoothLauncher.launchBluetooth(this, REQUEST_ENABLE_BT)
     }
 
     /**
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode ==REQUEST_ENABLE) {
+        if (requestCode ==REQUEST_ENABLE_BT) {
             if (resultCode == Activity.RESULT_OK) {
                 Log.e(TAG, "Bluetooth launched, start server")
                 mBluetoothLauncher.startServerSocket()
