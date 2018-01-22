@@ -8,19 +8,15 @@ import android.content.Intent
 import android.util.Log
 import java.util.*
 
-/**
- * Created by Teddy on 2018/1/21 0021.
- */
-
-class BluetoothLauncher {
+class BluetoothLauncher private constructor() {
     private val TAG = "BluetoothLauncher"
-    private val mBluetoothAdapter: BluetoothAdapter
-    private var mmServerSocket: BluetoothServerSocket? = null
     private val MY_UUID = UUID.fromString("f710e010-b190-4d24-a47b-eb7b100bab39")
+    private val mBluetoothAdapter: BluetoothAdapter?
+    private var mmServerSocket: BluetoothServerSocket? = null
 
-    private constructor(){
+    init {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-                ?: throw NullPointerException("Can't launch bluetooth")
+                ?: throw NullPointerException("Device does not support Bluetooth")
     }
 
     companion object {
@@ -37,9 +33,9 @@ class BluetoothLauncher {
      * Launch bluetooth
      */
     fun launchBluetooth(context: Activity, requestCode: Int) {
-        if (!mBluetoothAdapter.isEnabled) {
-            val enabler = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            context.startActivityForResult(enabler, requestCode)
+        if (mBluetoothAdapter?.isEnabled == false) {
+            val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            context.startActivityForResult(enableBTIntent, requestCode)
         }
     }
 
@@ -47,19 +43,17 @@ class BluetoothLauncher {
      * Start server
      */
     fun startServerSocket() {
-        if (!mBluetoothAdapter.isEnabled) {
+        if (mBluetoothAdapter?.isEnabled == false) {
             throw RuntimeException("Please launch bluetooth")
         }
         if (mmServerSocket == null) {
             return
         }
-        mmServerSocket = mBluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord("Teddy", MY_UUID)
+        mmServerSocket = mBluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord("Teddy", MY_UUID)
         // New thread to start a server socket and wait for connection
-        var thread = Thread {
-            var socket = mmServerSocket!!.accept()
-            if (socket == null) {
-                return@Thread
-            }
+        val thread = Thread {
+            val socket = mmServerSocket!!.accept()
+            socket?: return@Thread
             manageConnectedSocket(socket)
         }
         thread.start()
@@ -68,7 +62,7 @@ class BluetoothLauncher {
     /**
      * Connected socket manage
      */
-    fun manageConnectedSocket(socket: BluetoothSocket) {
+    private fun manageConnectedSocket(socket: BluetoothSocket) {
         Log.e(TAG, "Device successfully connected")
     }
 
@@ -77,17 +71,17 @@ class BluetoothLauncher {
      */
 
     fun searchDevice() {
-        if (mBluetoothAdapter.isDiscovering) {
+        if (mBluetoothAdapter?.isDiscovering == true) {
             mBluetoothAdapter.cancelDiscovery()
         }
-        mBluetoothAdapter.startDiscovery()
+        mBluetoothAdapter?.startDiscovery()
     }
 
     /**
      * Stop Searching
      */
     fun cancelSearch() {
-        if (mBluetoothAdapter.isDiscovering) {
+        if (mBluetoothAdapter?.isDiscovering == true) {
             mBluetoothAdapter.cancelDiscovery()
         }
     }
