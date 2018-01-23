@@ -40,6 +40,7 @@ class SearchActivity: BaseActivity() {
 
         mBluetoothLauncher = BluetoothLauncher.get()
         mBluetoothLauncher.searchDevice()
+        mBluetoothLauncher.startServerSocket()
     }
 
     /**
@@ -56,17 +57,24 @@ class SearchActivity: BaseActivity() {
         mAdapter = DeviceListAdapter(mData)
         mAdapter.setOnItemClickListener(object: DeviceListAdapter.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
-                val device = mData[position]
-                toast(device.name)
-                val bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
-                val t = Thread {
+                mBluetoothAdapter.cancelDiscovery()
+                val mmDevice = mData[position]
+                toast(mmDevice.name)
+                var bluetoothSocket: BluetoothSocket? = null
+                try {
+                    bluetoothSocket = mmDevice.createRfcommSocketToServiceRecord(MY_UUID)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Fetch socket error: ${e.message}")
+                }
+                Thread.sleep(500)
+                val connectThread = Thread {
                     try {
-                        bluetoothSocket.connect()
+                        bluetoothSocket!!.connect()
                     } catch (e: Exception) {
                         Log.e(TAG, "Bluetooth connection to server exception: ${e.message}")
                     }
                 }
-                t.start()
+                connectThread.start()
             }
         })
         deviceList.adapter = mAdapter

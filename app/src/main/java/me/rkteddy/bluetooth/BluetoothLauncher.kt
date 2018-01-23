@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.util.Log
+import java.io.IOException
 import java.util.*
 
 class BluetoothLauncher private constructor() {
@@ -46,17 +47,26 @@ class BluetoothLauncher private constructor() {
         if (mBluetoothAdapter?.isEnabled == false) {
             throw RuntimeException("Please launch bluetooth")
         }
+        mmServerSocket = mBluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord("Teddy", MY_UUID)
         if (mmServerSocket == null) {
             return
         }
-        mmServerSocket = mBluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord("Teddy", MY_UUID)
         // New thread to start a server socket and wait for connection
-        val thread = Thread {
-            val socket = mmServerSocket!!.accept()
-            socket?: return@Thread
-            manageConnectedSocket(socket)
+        val serverThread = Thread {
+            var socket: BluetoothSocket? = null
+            while(true){
+                try{
+                     socket = mmServerSocket!!.accept()
+                } catch (e: IOException) {
+                    break
+                }
+                if (socket != null) {
+                    manageConnectedSocket(socket)
+                    mmServerSocket!!.close()
+                }
+            }
         }
-        thread.start()
+        serverThread.start()
     }
 
     /**
