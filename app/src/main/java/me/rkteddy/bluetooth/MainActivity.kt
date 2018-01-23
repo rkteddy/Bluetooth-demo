@@ -47,13 +47,8 @@ class MainActivity : AppCompatActivity() {
      * Open search activity
      */
     fun search(v: View) {
-        var intent = Intent(this, SearchActivity::class.java)
+        val intent = Intent(this, SearchActivity::class.java)
         startActivity(intent)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // EventBus.getDefault().register(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

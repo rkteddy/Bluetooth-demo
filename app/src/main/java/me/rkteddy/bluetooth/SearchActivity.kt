@@ -17,10 +17,6 @@ import android.view.View
 import java.util.*
 import kotlinx.android.synthetic.main.activity_search.*
 
-/**
- * Created by Teddy on 2018/1/21 0018.
- */
-
 class SearchActivity: BaseActivity() {
 
     private val MY_UUID = UUID.fromString("f710e010-b190-4d24-a47b-eb7b100bab39")
@@ -46,7 +42,7 @@ class SearchActivity: BaseActivity() {
     /**
      * Initialze RecycleView
      */
-    fun initRecycleView() {
+    private fun initRecycleView() {
         deviceList.layoutManager = LinearLayoutManager(this)
         val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         val pairedDevices = mBluetoothAdapter.bondedDevices
@@ -57,6 +53,7 @@ class SearchActivity: BaseActivity() {
         mAdapter = DeviceListAdapter(mData)
         mAdapter.setOnItemClickListener(object: DeviceListAdapter.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
+                // Start a thread for connection
                 mBluetoothAdapter.cancelDiscovery()
                 val mmDevice = mData[position]
                 toast(mmDevice.name)
@@ -71,8 +68,15 @@ class SearchActivity: BaseActivity() {
                     try {
                         bluetoothSocket!!.connect()
                     } catch (e: Exception) {
+                        // Unable to connect, try to close the socket and get out
                         Log.e(TAG, "Bluetooth connection to server exception: ${e.message}")
+                        try {
+                            bluetoothSocket!!.close()
+                        } catch (e: Exception) {
+                        }
+                        return@Thread
                     }
+                    manageConnectedSocket(bluetoothSocket!!)
                 }
                 connectThread.start()
             }
@@ -101,7 +105,7 @@ class SearchActivity: BaseActivity() {
     /**
      * Initialize Receiver
      */
-    fun initReceiver() {
+    private fun initReceiver() {
         val filter = IntentFilter()
         filter.addAction(BluetoothDevice.ACTION_FOUND)
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
