@@ -44,9 +44,7 @@ class BluetoothLauncher private constructor() {
             throw RuntimeException("Please launch bluetooth")
         }
         mmServerSocket = mBluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord("Teddy", MY_UUID)
-        if (mmServerSocket == null) {
-            return
-        }
+        mmServerSocket?: return
         // New thread to start a server socket and wait for connection
         val serverThread = Thread {
             var socket: BluetoothSocket? = null
@@ -75,7 +73,6 @@ class BluetoothLauncher private constructor() {
     /**
      * Search devices
      */
-
     fun searchDevice() {
         if (mBluetoothAdapter.isDiscovering) {
             mBluetoothAdapter.cancelDiscovery()

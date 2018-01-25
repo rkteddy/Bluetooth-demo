@@ -40,7 +40,7 @@ class SearchActivity: BaseActivity() {
     }
 
     /**
-     * Initialze RecycleView
+     * Initialize RecycleView
      */
     private fun initRecycleView() {
         deviceList.layoutManager = LinearLayoutManager(this)
