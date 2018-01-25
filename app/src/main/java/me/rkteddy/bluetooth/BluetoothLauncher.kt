@@ -12,13 +12,9 @@ import java.util.*
 class BluetoothLauncher private constructor() {
     private val TAG = "BluetoothLauncher"
     private val MY_UUID = UUID.fromString("f710e010-b190-4d24-a47b-eb7b100bab39")
-    private val mBluetoothAdapter: BluetoothAdapter?
+    private val mBluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+            ?: throw NullPointerException("Device does not support Bluetooth")
     private var mmServerSocket: BluetoothServerSocket? = null
-
-    init {
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-                ?: throw NullPointerException("Device does not support Bluetooth")
-    }
 
     companion object {
         fun get(): BluetoothLauncher{
@@ -34,7 +30,7 @@ class BluetoothLauncher private constructor() {
      * Launch bluetooth
      */
     fun launchBluetooth(context: Activity, requestCode: Int) {
-        if (mBluetoothAdapter?.isEnabled == false) {
+        if (!mBluetoothAdapter.isEnabled) {
             val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             context.startActivityForResult(enableBTIntent, requestCode)
         }
@@ -44,10 +40,10 @@ class BluetoothLauncher private constructor() {
      * Start server
      */
     fun startServerSocket() {
-        if (mBluetoothAdapter?.isEnabled == false) {
+        if (!mBluetoothAdapter.isEnabled) {
             throw RuntimeException("Please launch bluetooth")
         }
-        mmServerSocket = mBluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord("Teddy", MY_UUID)
+        mmServerSocket = mBluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord("Teddy", MY_UUID)
         if (mmServerSocket == null) {
             return
         }
@@ -81,17 +77,17 @@ class BluetoothLauncher private constructor() {
      */
 
     fun searchDevice() {
-        if (mBluetoothAdapter?.isDiscovering == true) {
+        if (mBluetoothAdapter.isDiscovering) {
             mBluetoothAdapter.cancelDiscovery()
         }
-        mBluetoothAdapter?.startDiscovery()
+        mBluetoothAdapter.startDiscovery()
     }
 
     /**
      * Stop Searching
      */
     fun cancelSearch() {
-        if (mBluetoothAdapter?.isDiscovering == true) {
+        if (mBluetoothAdapter.isDiscovering) {
             mBluetoothAdapter.cancelDiscovery()
         }
     }
