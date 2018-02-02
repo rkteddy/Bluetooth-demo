@@ -85,10 +85,10 @@ class SearchActivity: BaseActivity() {
     }
 
     /**
-     * Process for bluetooth successfully connect to server
+     * Process for bluetooth successfully connecting to server
      */
     fun manageConnectedSocket(socket: BluetoothSocket) {
-        Log.e(TAG, "Successfully connect to server")
+        toast("Successfully connect to server")
     }
 
     /**

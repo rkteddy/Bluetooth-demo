@@ -5,9 +5,9 @@ import android.widget.Toast
 
 open class BaseActivity: AppCompatActivity() {
     /**
-     * 显示toast
+     * For a oast
      */
     fun toast(text: String, duration: Int = Toast.LENGTH_SHORT) {
-        Toast.makeText(this, text, duration).show();
+        Toast.makeText(this, text, duration).show()
     }
 }

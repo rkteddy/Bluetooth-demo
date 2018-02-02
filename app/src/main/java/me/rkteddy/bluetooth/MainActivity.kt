@@ -30,13 +30,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Show short toast
-     */
-    fun toast(text: String) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
-
-    /**
      * Launch bluetooth
      */
     fun launch(v: View) {
